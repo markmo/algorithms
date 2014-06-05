@@ -23,23 +23,40 @@ object SCC extends App {
 
     val leader = collection.mutable.Map[Int, Int]()
 
-    def DFS(i: Int): Unit = {
-      visited += i
-      leader(i) = s
-      if (g contains i) {
-        for (j <- g(i) if !(visited contains j)) {
-          DFS(j)
-        }
-      }
-      t += 1
-      f(i) = t
-    }
+//    def DFS(i: Int): Unit = {
+//      visited += i
+//      leader(i) = s
+//      for (j <- g getOrElse (i, Nil) if !(visited contains j)) {
+//        DFS(j)
+//      }
+//      t += 1
+//      f(i) = t
+//    }
 
     val n = g.keys.max
 
+    val st = collection.mutable.Stack[Int]()
+
+//    for (i <- n to 1 by -1 if !(visited contains i)) {
+//      s = i
+//      DFS(i)
+//    }
+
     for (i <- n to 1 by -1 if !(visited contains i)) {
+      visited += i
       s = i
-      DFS(i)
+      st push i
+
+      while (!st.isEmpty) {
+        val v = st.pop()
+        visited += v
+        leader(v) = s
+        for (w <- g getOrElse (v, Nil) if !(visited contains w)) {
+          st push w
+        }
+        t += 1
+        f(v) = t
+      }
     }
 
     (leader.toMap, f.toMap)
@@ -74,7 +91,7 @@ object SCC extends App {
     adjlist(edges)
   }
 
-  val g = readGraph("SCC.txt")
+  val g = readGraph("test2.txt")
 
   val rg = reverseArcs(g)
 
